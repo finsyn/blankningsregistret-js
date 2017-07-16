@@ -1,12 +1,14 @@
-const { } = require('ramda');
+const { pipeP } = require('ramda');
 const { br_url } = require('./config.json');
-const fetchFileP = require('./fetch.js');
+const { fetchFileP, getFileUrlP, readXml, parseEntries } = require('./fetch.js');
 
 const getEntries = pipeP(
+  getFileUrlP,
   fetchFileP,
-  parseEntries
+  readXml,
+  parseEntries,
+  console.log
 );
 
-module.exports = getEntries;
-
- 
+getEntries(br_url);
+// module.exports = getEntries;

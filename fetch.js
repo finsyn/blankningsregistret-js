@@ -1,7 +1,9 @@
 const http = require('http');
 const { joinP, pOf } = require('./ramdap');
+const fs = require('fs');
+const XLSX = require('xlsx');
 const scrapeIt = require('scrape-it');
-const { curry, join, converge, always, concat, constructN, pipeP, invoker, tap, pipe, prop } = require('ramda');
+const { zipObj, __, map, lt, filter, gt, length, groupWith, equals, tail, keys, values, curry, head, curryN, join, converge, always, concat, constructN, pipeP, invoker, tap, pipe, prop } = require('ramda');
 const { parse } = require('url');
 
 function getFileUrlP (url) {
@@ -13,11 +15,13 @@ function getFileUrlP (url) {
     }
   });
 
+  const parseOne = curryN(1, parse);
+
   const getUrlParts = joinP(
     [
-      pipe(tap(console.log),parse, prop('protocol'), pOf),
+      pipe(parseOne, prop('protocol'), pOf),
       always('//'),
-      pipe(tap(console.log),parse, prop('host'), pOf),
+      pipe(parseOne, prop('host'), pOf),
       pipeP(scrapeP, prop('url'))
     ]
   );
@@ -40,7 +44,86 @@ function fetchFileP (url) {
   return new Promise(curry(getP)(url)); 
 }
 
+function readXml (readableStream) {
+
+  const readStream = (stream, resolve, reject) => {
+    let buffers = [];
+    stream.on('data', function(data) { buffers.push(data); });
+    stream.on('end', function() {
+      let buffer = Buffer.concat(buffers);
+      let workbook = XLSX.read(buffer, {type:'buffer'});
+      resolve(workbook);
+    });
+  };
+
+  return new Promise(curry(readStream)(readableStream));
+}
+
+// https://github.com/SheetJS/js-xlsx#working-with-the-workbook
+function parseEntries (workbook) {
+
+  const getSheetName = pipe(
+    prop('SheetNames'),
+    head
+  );
+
+  const getSheets = prop('Sheets');
+
+  const getSheet = converge(
+    prop,
+    [
+      getSheetName,
+      getSheets
+    ]
+  );
+
+  const isSameRow = (idx1, idx2) => tail(idx1) === tail(idx2);
+
+  const getEntriesIdx = pipe(
+    keys,
+    groupWith(isSameRow),
+    filter(pipe(length, lt(5)))
+  );
+
+  const getVals = (ws, idxGroups) => map(
+    // tap(console.log),
+    map(prop(__, ws))
+  )(idxGroups);
+
+  const toEntry = pipe(
+    map(prop('v')),
+    zipObj(
+      [
+        'published_at',
+        'position_holder_name',
+        'issuer_name',
+        'isin',
+        'percent',
+        'taken_date',
+        'comment'
+      ]
+    )
+  );
+
+  const getEntries = pipe(
+    getSheet,
+    converge(
+      getVals,
+      [
+        sheet => sheet,
+        getEntriesIdx
+      ]
+    ),
+    // tap(console.log),
+    map(toEntry)
+  );
+
+  return getEntries(workbook);
+}
+
 module.exports = {
   getFileUrlP,
-  fetchFileP
+  fetchFileP,
+  readXml,
+  parseEntries
 };
