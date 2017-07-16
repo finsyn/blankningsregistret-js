@@ -1,0 +1,18 @@
+{
+  "name": "blankningsregistret",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "tornilssonohrn@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "http": "0.0.0",
+    "ramda": "~0.24.1",
+    "scrape-it": "~3.3.2",
+    "tap": "~10.7.0",
+    "xlsx": "~0.10.8"
+  }
+}
