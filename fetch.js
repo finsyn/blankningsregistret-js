@@ -3,7 +3,7 @@ const { joinP, pOf } = require('./ramdap');
 const fs = require('fs');
 const XLSX = require('xlsx');
 const scrapeIt = require('scrape-it');
-const { zipObj, __, map, lt, filter, gt, length, groupWith, equals, tail, keys, values, curry, head, curryN, join, converge, always, concat, constructN, pipeP, invoker, tap, pipe, prop } = require('ramda');
+const { zipWith, call, zipObj, __, map, lt, filter, gt, length, groupWith, equals, tail, keys, values, curry, head, curryN, join, converge, always, concat, constructN, pipeP, invoker, tap, pipe, prop } = require('ramda');
 const { parse } = require('url');
 
 function getFileUrlP (url) {
@@ -90,8 +90,21 @@ function parseEntries (workbook) {
     map(prop(__, ws))
   )(idxGroups);
 
+  const dateConstruct = constructN(1, Date);
+
   const toEntry = pipe(
-    map(prop('v')),
+      zipWith(
+        call,
+        [
+          pipe(prop('w'), dateConstruct),
+          prop('v'),
+          prop('v'),
+          prop('v'),
+          prop('v'),
+          pipe(prop('w'), dateConstruct),
+          prop('v')
+        ]
+      ),
     zipObj(
       [
         'published_at',
