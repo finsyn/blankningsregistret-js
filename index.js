@@ -6,8 +6,7 @@ const getEntries = pipeP(
   getFileUrlP,
   fetchFileP,
   readXml,
-  parseEntries,
-  console.log
+  parseEntries
 );
 
 getEntries(br_url);

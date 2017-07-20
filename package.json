@@ -14,5 +14,8 @@
     "scrape-it": "~3.3.2",
     "tap": "~10.7.0",
     "xlsx": "~0.10.8"
+  },
+  "devDependencies": {
+    "lien": "~3.0.4"
   }
 }

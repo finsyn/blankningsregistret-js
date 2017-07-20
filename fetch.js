@@ -82,7 +82,8 @@ function parseEntries (workbook) {
   const getEntriesIdx = pipe(
     keys,
     groupWith(isSameRow),
-    filter(pipe(length, lt(5)))
+    filter(pipe(length, lt(5))), // > 5 column rows are considered as entries ...
+    tail                         // ... except the first description one
   );
 
   const getVals = (ws, idxGroups) => map(
