@@ -4,6 +4,11 @@ steps:
   args: [
   'install'
   ]
+  # Fetch mocks for tests
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: [
+    'cp', 'gs://mocks/blankningsregistret/*', 'mock/'
+  ]
   # Test
 - name: 'gcr.io/cloud-builders/npm'
   args: [
