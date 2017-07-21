@@ -1,0 +1,17 @@
+steps:
+  # Test
+- name: 'gcr.io/cloud-builders/npm'
+  args: [
+  'test'
+  ]
+  # Pack
+- name: 'gcr.io/cloud-builders/npm'
+  args: [
+  'pack'
+  ] 
+  # Publish to google cloud storage
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: [
+  'cp', '*.tgz', 'gs://insikt-npm/'
+  ]
+images: []

@@ -3,7 +3,7 @@ const { joinP, pOf } = require('./ramdap');
 const fs = require('fs');
 const XLSX = require('xlsx');
 const scrapeIt = require('scrape-it');
-const { zipWith, call, zipObj, __, map, lt, filter, gt, length, groupWith, equals, tail, keys, values, curry, head, curryN, join, converge, always, concat, constructN, pipeP, invoker, tap, pipe, prop } = require('ramda');
+const { zipWith, call, zipObj, __, map, allPass, lt, lte, gte, filter, gt, length, groupWith, equals, tail, keys, values, curry, head, curryN, join, converge, always, concat, constructN, pipeP, invoker, tap, pipe, prop } = require('ramda');
 const { parse } = require('url');
 
 function getFileUrlP (url) {
@@ -57,6 +57,21 @@ function readXml (readableStream) {
   };
 
   return new Promise(curry(readStream)(readableStream));
+}
+
+function timeFilter (field, from, to) {
+
+  const isWithinRange = pipe(
+    prop(field),
+    allPass(
+      [
+        lte(from),
+        gte(to)
+      ]
+    )
+  );
+
+  return filter(isWithinRange);
 }
 
 // https://github.com/SheetJS/js-xlsx#working-with-the-workbook
@@ -139,5 +154,6 @@ module.exports = {
   getFileUrlP,
   fetchFileP,
   readXml,
-  parseEntries
+  parseEntries,
+  timeFilter
 };
