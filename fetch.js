@@ -1,4 +1,4 @@
-const http = require('http');
+const https = require('https');
 const { joinP, pOf } = require('./ramdap');
 const fs = require('fs');
 const XLSX = require('xlsx');
@@ -38,7 +38,7 @@ function getFileUrlP (url) {
 function fetchFileP (url) {
 
   const getP = (url, resolve, reject) => {
-    http.get(url, resolve, reject);
+    https.get(url, resolve, reject);
   };
 
   return new Promise(curry(getP)(url)); 
@@ -102,7 +102,6 @@ function parseEntries (workbook) {
   );
 
   const getVals = (ws, idxGroups) => map(
-    // tap(console.log),
     map(prop(__, ws))
   )(idxGroups);
 
@@ -143,7 +142,6 @@ function parseEntries (workbook) {
         getEntriesIdx
       ]
     ),
-    // tap(console.log),
     map(toEntry)
   );
 
