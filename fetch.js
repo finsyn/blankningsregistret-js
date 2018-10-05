@@ -3,14 +3,17 @@ const { joinP, pOf } = require('./ramdap');
 const fs = require('fs');
 const XLSX = require('xlsx');
 const scrapeIt = require('scrape-it');
-const { zipWith, call, zipObj, __, map, allPass, lt, lte, gte, filter, gt, length, groupWith, equals, tail, keys, values, curry, head, curryN, join, converge, always, concat, constructN, pipeP, invoker, tap, pipe, prop } = require('ramda');
+const { zipWith, call, zipObj, __, map, allPass, lt, lte, gte,
+        filter, gt, length, groupWith, equals, tail, keys, values,
+        curry, head, curryN, join, converge, always, concat, constructN,
+        pipeP, invoker, tap, pipe, prop, identity } = require('ramda');
 const { parse } = require('url');
 
 function getFileUrlP (url) {
 
   const scrapeP = url => scrapeIt(url, {
     url: {
-      selector: '.link-list ul li:nth-child(2) a',
+      selector: '.link-list ul li:nth-child(1) a',
       attr: 'href'
     }
   });
@@ -74,79 +77,72 @@ function timeFilter (field, from, to) {
   return filter(isWithinRange);
 }
 
-// https://github.com/SheetJS/js-xlsx#working-with-the-workbook
-function parseEntries (workbook) {
+const getSheetName = pipe(
+  prop('SheetNames'),
+  head
+);
 
-  const getSheetName = pipe(
-    prop('SheetNames'),
-    head
-  );
+const getSheets = prop('Sheets');
 
-  const getSheets = prop('Sheets');
+const getSheet = converge(
+  prop,
+  [
+    getSheetName,
+    getSheets
+  ]
+);
 
-  const getSheet = converge(
-    prop,
+const isSameRow = (idx1, idx2) => tail(idx1) === tail(idx2);
+
+const getEntriesIdx = pipe(
+  keys,
+  groupWith(isSameRow),
+  filter(pipe(length, lt(4))), // > 5 column rows are considered as entries ...
+  tail                         // ... except the first description one
+);
+
+const getVals = (ws, idxGroups) => map(
+  map(prop(__, ws))
+)(idxGroups);
+
+const dateConstruct = constructN(1, Date);
+
+const toEntry = pipe(
+  zipWith(
+    call,
     [
-      getSheetName,
-      getSheets
+      prop('v'),
+      prop('v'),
+      prop('v'),
+      prop('v'),
+      pipe(prop('w'), dateConstruct)
     ]
-  );
+  ),
+  zipObj(
+    [
+      'position_holder_name',
+      'issuer_name',
+      'isin',
+      'percent',
+      'taken_date'
+    ]
+  )
+)
 
-  const isSameRow = (idx1, idx2) => tail(idx1) === tail(idx2);
+const getEntries = pipe(
+  getSheet,
+  converge(
+    getVals,
+    [
+      identity,
+      getEntriesIdx
+    ]
+  ),
+  map(toEntry)
+);
 
-  const getEntriesIdx = pipe(
-    keys,
-    groupWith(isSameRow),
-    filter(pipe(length, lt(5))), // > 5 column rows are considered as entries ...
-    tail                         // ... except the first description one
-  );
-
-  const getVals = (ws, idxGroups) => map(
-    map(prop(__, ws))
-  )(idxGroups);
-
-  const dateConstruct = constructN(1, Date);
-
-  const toEntry = pipe(
-      zipWith(
-        call,
-        [
-          pipe(prop('w'), dateConstruct),
-          prop('v'),
-          prop('v'),
-          prop('v'),
-          prop('v'),
-          pipe(prop('w'), dateConstruct),
-          prop('v')
-        ]
-      ),
-    zipObj(
-      [
-        'published_at',
-        'position_holder_name',
-        'issuer_name',
-        'isin',
-        'percent',
-        'taken_date',
-        'comment'
-      ]
-    )
-  );
-
-  const getEntries = pipe(
-    getSheet,
-    converge(
-      getVals,
-      [
-        sheet => sheet,
-        getEntriesIdx
-      ]
-    ),
-    map(toEntry)
-  );
-
-  return getEntries(workbook);
-}
+// https://github.com/SheetJS/js-xlsx#working-with-the-workbook
+const parseEntries = getEntries
 
 module.exports = {
   getFileUrlP,
