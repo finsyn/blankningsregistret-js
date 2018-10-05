@@ -10,7 +10,7 @@ const getEntries = ({ from=defaultFrom, to=defaultTo } = {}) => pipeP(
   fetchFileP,
   readXml,
   parseEntries,
-  timeFilter('taken_at', from, to)
+  timeFilter('taken_date', from, to)
 )(br_url);
 
 module.exports = getEntries;
