@@ -6,7 +6,7 @@ const scrapeIt = require('scrape-it');
 const { zipWith, call, zipObj, __, map, allPass, lt, lte, gte,
         filter, gt, length, groupWith, equals, tail, keys, values,
         curry, head, curryN, join, converge, always, concat, constructN,
-        pipeP, invoker, tap, pipe, prop, identity } = require('ramda');
+        pipeP, invoker, tap, pipe, prop, identity, path } = require('ramda');
 const { parse } = require('url');
 
 function getFileUrlP (url) {
@@ -25,7 +25,7 @@ function getFileUrlP (url) {
       pipe(parseOne, prop('protocol'), pOf),
       always('//'),
       pipe(parseOne, prop('host'), pOf),
-      pipeP(scrapeP, prop('url'))
+      pipeP(scrapeP, path(['data', 'url']))
     ]
   );
 

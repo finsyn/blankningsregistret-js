@@ -2,3 +2,4 @@ node_modules/
 *.tgz
 *.xlsx
 mock/mock.html
+package-lock.json

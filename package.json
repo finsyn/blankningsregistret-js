@@ -3,6 +3,10 @@
   "version": "0.1.1",
   "description": "",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:finsyn/blankningsregistret-js.git"
+  },
   "scripts": {
     "test": "tap *.spec.js"
   },
@@ -11,11 +15,10 @@
   "dependencies": {
     "http": "0.0.0",
     "ramda": "~0.24.1",
-    "scrape-it": "~3.3.2",
+    "scrape-it": "^5.1.0",
     "xlsx": "~0.10.8"
   },
   "devDependencies": {
-    "lien": "~3.0.4",
-    "tap": "~10.7.0"
+    "tap": "^12.1.0"
   }
 }
