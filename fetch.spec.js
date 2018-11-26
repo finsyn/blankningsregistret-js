@@ -12,7 +12,7 @@ t.test('get file url', t => {
   
   const server = mockServer(PORT);  
 
-  getFileUrlP(url)
+  getFileUrlP({ url })
     .then(result => {
       t.match(result, `${url}${filePath}`);
       server.close();
