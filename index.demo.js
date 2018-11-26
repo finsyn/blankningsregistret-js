@@ -1,5 +1,5 @@
 const run = require('./index')
 
-run()
+run({ historical: true })
   .then(console.log)
   .catch(console.error)

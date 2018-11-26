@@ -16,8 +16,13 @@ npm install blankningsregistret --save
 ```javascript
 const br = require('blankningsregistret');
 
-// get positions published within the last 30 days
+// get currently active positions published within the last 30 days
 const entries = br();
+
+// get historical positions published within the last 30 days
+const entries = br({
+  historical: true
+});
 
 // get positions published within a custom timespan
 const thatMonthEntries = br({

@@ -9,11 +9,14 @@ const { zipWith, call, zipObj, __, map, allPass, lt, lte, gte,
         pipeP, invoker, tap, pipe, prop, identity, path } = require('ramda');
 const { parse } = require('url');
 
-function getFileUrlP (url) {
+function getFileUrlP ({ url, historical = false }) {
+
+  // naive, FI puts historical position link below active positions link
+  const linkNumber = (historical) ? 2 : 1
 
   const scrapeP = url => scrapeIt(url, {
     url: {
-      selector: '.link-list ul li:nth-child(1) a',
+      selector: `.link-list ul li:nth-child(${linkNumber}) a`,
       attr: 'href'
     }
   });
