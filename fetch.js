@@ -7,7 +7,7 @@ const { zipWith, call, zipObj, __, map, allPass, lt, lte, gte,
         filter, gt, length, groupWith, equals, tail, keys, values,
         curry, head, curryN, join, converge, always, concat, constructN,
         pipeP, invoker, tap, pipe, prop, identity, path, ifElse, is,
-        replace } = require('ramda');
+        replace, toUpper } = require('ramda');
 const { parse } = require('url');
 
 function getFileUrlP ({ url, historical = false }) {
@@ -124,7 +124,10 @@ const toEntry = pipe(
   zipWith(
     call,
     [
-      prop('v'),
+      // recently FI seems to store all names in uppercase
+      // so keep it like this for everyone to make them comparable
+      // with old values
+      pipe(prop('v'), toUpper),
       prop('v'),
       prop('v'),
       pipe(prop('v'), parsePercent),
