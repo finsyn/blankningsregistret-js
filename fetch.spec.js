@@ -30,13 +30,13 @@ t.test('parse entries', t => {
       const entries = parseEntries(workbook);
       // only test swedish ones for now, some foreign ones have faulty input in the register
       const sweEntries = entries.filter(e => /SE[0-9]{10}/.test(e.isin));
-      t.equals(sweEntries.length, 134)
+      t.equals(sweEntries.length, 135)
       sweEntries.forEach(e => {
         t.match(e, {
           position_holder_name: /.+/,
           issuer_name: /.+/,
           isin: /[A-Z]{2,3}[0-9]{10}/,
-          percent: /[0-9\.]+/,
+          percent: /^[0-9\.]+/,
           taken_date: Date
         });
       });

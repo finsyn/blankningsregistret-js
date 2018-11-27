@@ -6,7 +6,8 @@ const scrapeIt = require('scrape-it');
 const { zipWith, call, zipObj, __, map, allPass, lt, lte, gte,
         filter, gt, length, groupWith, equals, tail, keys, values,
         curry, head, curryN, join, converge, always, concat, constructN,
-        pipeP, invoker, tap, pipe, prop, identity, path } = require('ramda');
+        pipeP, invoker, tap, pipe, prop, identity, path, ifElse, is,
+        replace } = require('ramda');
 const { parse } = require('url');
 
 function getFileUrlP ({ url, historical = false }) {
@@ -110,6 +111,15 @@ const getVals = (ws, idxGroups) => map(
 
 const dateConstruct = constructN(1, Date);
 
+const parsePercent = ifElse(
+  is(String),
+  pipe(
+    replace(/<0\,5/g, '0.0'),
+    constructN(1, Number)
+  ),
+  identity
+)
+
 const toEntry = pipe(
   zipWith(
     call,
@@ -117,7 +127,7 @@ const toEntry = pipe(
       prop('v'),
       prop('v'),
       prop('v'),
-      prop('v'),
+      pipe(prop('v'), parsePercent),
       pipe(prop('w'), dateConstruct)
     ]
   ),
