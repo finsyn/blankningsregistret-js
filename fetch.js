@@ -11,35 +11,9 @@ const { zipWith, call, zipObj, __, map, allPass, lt, lte, gte,
 const { parse } = require('url');
 
 function getFileUrlP ({ url, historical = false }) {
-
   // naive, FI puts historical position link below active positions link
-  const linkNumber = (historical) ? 2 : 1
-
-  const scrapeP = url => scrapeIt(url, {
-    url: {
-      selector: `.link-list ul li:nth-child(${linkNumber}) a`,
-      attr: 'href'
-    }
-  });
-
-  const parseOne = curryN(1, parse);
-
-  const getUrlParts = joinP(
-    [
-      pipe(parseOne, prop('protocol'), pOf),
-      always('//'),
-      pipe(parseOne, prop('host'), pOf),
-      pipeP(scrapeP, path(['data', 'url']))
-    ]
-  );
-
-  const getUrl = pipeP(
-    getUrlParts,
-    join(''),
-    pOf
-  );
-
-  return getUrl(url);
+  const fileUrl = historical ? `${url}/GetHistFile/` : `${url}/GetAktuellFile/`
+  return Promise.resolve(fileUrl)
 }
 
 function fetchFileP (url) {
