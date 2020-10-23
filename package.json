@@ -8,7 +8,8 @@
     "url": "git@github.com:finsyn/blankningsregistret-js.git"
   },
   "scripts": {
-    "test": "tap *.spec.js"
+    "test": "tap *.spec.js",
+    "demo": "node -e 'require(\"./index\")()'"
   },
   "author": "tornilssonohrn@gmail.com",
   "license": "ISC",
