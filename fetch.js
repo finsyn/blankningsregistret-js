@@ -89,6 +89,7 @@ const parsePercent = ifElse(
   is(String),
   pipe(
     replace(/<0\,5/g, '0.0'),
+    replace(/\,/g, '.'),
     constructN(1, Number)
   ),
   identity
